@@ -5,23 +5,24 @@ $errores = [];
 $exito = false;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $name               = trim($_POST["name"]);
+    $last_name          = trim($_POST["last_name"]);
+    $cedula             = trim($_POST["cedula"]);
+    $email              = trim($_POST["email"]);
+    $passwore           = trim($_POST["passwore"]);
+    $confirmar_passwore = trim($_POST["confirmar_passwore"]);
+    $telefono           = trim($_POST["telefono"]);
 
-    $name      = trim($_POST["name"]);
-    $last_name = trim($_POST["last_name"]);
-
-
-    if (empty($name)) {
-        $errores[] = "El nombre es obligatorio.";
-    }
-    if (empty($last_name)) {
-        $errores[] = "El apellido es obligatorio.";
-    }
-
+    $errores = validar_usuario($name, $last_name, $cedula, $email, $passwore, $confirmar_passwore, $telefono);
 
     if (empty($errores)) {
-        $exito = insert_usuario($name, $last_name);
+        $exito = insert_usuario($name, $last_name, $cedula, $email, $passwore, $telefono);
+        if ($exito) {
+            $name = $last_name = $cedula = $email = $passwore = $confirmar_passwore = $telefono = '';
+        }
     }
 }
+
 
 $usuarios = obtener_usuarios();
 ?>
@@ -39,9 +40,9 @@ $usuarios = obtener_usuarios();
 
     <h2>Agregar usuario</h2>
 
-    <?php if (!empty($errores)){ ?>
+    <?php if (!empty($errores)) { ?>
         <div>
-            <?php foreach ($errores as $error){ ?>
+            <?php foreach ($errores as $error) { ?>
                 <p><?php echo $error ?></p>
             <?php } ?>
         </div>
@@ -54,10 +55,25 @@ $usuarios = obtener_usuarios();
 
     <form method="POST" action="">
         <label>Nombre:</label>
-        <input type="text" name="name" value="<?php echo $name ?? '' ?>">
+        <input type="text" name="name" value="<?php echo $name ?? '' ?>"><br>
 
         <label>Apellido:</label>
-        <input type="text" name="last_name" value="<?php echo $last_name ?? '' ?>">
+        <input type="text" name="last_name" value="<?php echo $last_name ?? '' ?>"><br>
+
+        <label>Cédula:</label>
+        <input type="text" name="cedula" value="<?php echo $cedula ?? '' ?>"><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" value="<?php echo $email ?? '' ?>"><br>
+        
+        <label>Contraseña:</label>
+        <input type="password" name="passwore"><br>
+
+        <label>Confirmar Contraseña:</label>
+        <input type="password" name="confirmar_passwore"><br>
+
+        <label>Teléfono:</label>
+        <input type="text" name="telefono" value="<?php echo $telefono ?? '' ?>"><br>
 
         <button type="submit">Agregar</button>
     </form>
