@@ -63,6 +63,7 @@ function validar_usuario(string $name, string $last_name, string $cedula, string
 
     return $errores;
 }
+
 function email_existe(string $email): bool
 {
     require './DB/conexion.php';
