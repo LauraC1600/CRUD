@@ -1,27 +1,8 @@
 <?php
 
-function obtener_conexion()
-{
-    global $conex;
+require_once __DIR__ . '/../includes/users/get.php';
 
-    if (!isset($conex)) {
-        require_once __DIR__ . '/conexion.php';
-    }
-
-    return $conex;
-}
-
-function email_existe(string $email): bool
-{
-    $conex = obtener_conexion();
-    $stmt  = mysqli_prepare($conex, "SELECT id FROM usuario WHERE email = ?");
-    mysqli_stmt_bind_param($stmt, "s", $email);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_store_result($stmt);
-    return mysqli_stmt_num_rows($stmt) > 0;
-}
-
-function validar_usuario(string $email, string $passwore): array
+function validar_usuario_pass(string $email, string $passwore): array
 {
     $errores = [];
 
@@ -34,16 +15,59 @@ function validar_usuario(string $email, string $passwore): array
     return $errores;
 }
 
-function login(string $email, string $passwore): array|false
+
+
+
+
+function validar_usuario(string $name, string $last_name, string $cedula, string $email, string $passwore, string $confirmar_passwore, string $telefono): array
 {
-    $conex     = obtener_conexion();
-    $sql       = "SELECT id, email, passwore FROM usuario WHERE email = '$email'";
-    $resultado = mysqli_query($conex, $sql);
-    $usuario   = mysqli_fetch_assoc($resultado);
+    $errores = [];
 
-    if (!$usuario) return false;
+    if (empty($name))      $errores[] = "El nombre es obligatorio.";
+    elseif (!is_string($name) || is_numeric($name)) $errores[]="El nombre debe ser solo texto";
+    if (empty($last_name)) $errores[] = "El apellido es obligatorio.";
+    elseif (!is_string($last_name) || is_numeric($last_name))$errores[]="El nombre debe ser solo texto";
+    if (empty($cedula))    $errores[] = "La cédula es obligatoria.";
+    elseif(!ctype_digit($cedula)) $errores[] = "La cédula debe contener solo números.";
+    elseif (cedula_existe($cedula)) $errores[] = "La cedula ya está registrada.";
+    elseif(strlen((string)$cedula)< 9 ) $errores[] ="La cedula debe ser minimo de 9 dijitos"; 
+    if (empty($email))     $errores[] = "El email es obligatorio.";
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errores[] = "El email no es válido.";
+    elseif (email_existe($email)) $errores[] = "El email ya está registrado.";
+    if (empty($passwore))  $errores[] = "La contraseña es obligatoria.";
+    elseif (strlen($passwore) < 6) $errores[] = "La contraseña debe tener al menos 6 caracteres.";
+    elseif ($passwore !== $confirmar_passwore) $errores[] = "Las contraseñas no coinciden.";
+    if (empty($telefono))  $errores[] = "El teléfono es obligatorio.";
+    elseif(strlen((string)$telefono)< 9 ) $errores[] ="El telefono debe ser minimo de 9 dijitos"; 
 
-    if (!password_verify($passwore, $usuario['passwore'])) return false;
-
-    return $usuario;
+    return $errores;
 }
+
+
+function validar_usuario_actualizar(int $id, string $name, string $last_name, string $cedula, string $email, string $telefono): array
+{
+    $errores = [];
+
+    if (empty($name))      $errores[] = "El nombre es obligatorio.";
+    elseif (!is_string($name) || is_numeric($name)) $errores[]="El nombre debe ser solo texto";
+    if (empty($last_name)) $errores[] = "El apellido es obligatorio.";
+    elseif (!is_string($last_name) || is_numeric($last_name))$errores[]="El apellido debe ser solo texto";
+    if (empty($cedula))    $errores[] = "La cédula es obligatoria.";
+    elseif(!ctype_digit($cedula)) $errores[] = "La cédula debe contener solo números.";
+    elseif (cedula_existe($cedula, $id)) $errores[] = "La cedula ya está registrada.";
+    elseif(strlen((string)$cedula)< 9 ) $errores[] ="La cedula debe ser minimo de 9 dijitos";
+    if (empty($email))     $errores[] = "El email es obligatorio.";
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errores[] = "El email no es válido.";
+    elseif (email_existe($email, $id)) $errores[] = "El email ya está registrado.";
+    if (empty($telefono))  $errores[] = "El teléfono es obligatorio.";
+    elseif(strlen((string)$telefono)< 9 ) $errores[] ="El telefono debe ser minimo de 9 dijitos";
+
+    return $errores;
+}
+
+$status = isset($_GET['status']) ? (int) $_GET['status'] : 0;
+function resultado($status){
+
+    var_dump($status);
+}
+

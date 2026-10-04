@@ -1,6 +1,8 @@
 <?php
 session_start();
-require './db/funciones.php';
+require_once __DIR__ . '/includes/users/get.php';
+require_once __DIR__ . '/db/funciones.php';
+
 
 $errores = [];
 $email   = '';
@@ -9,20 +11,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email    = trim($_POST["email"]    ?? '');
     $passwore = trim($_POST["passwore"] ?? '');
 
-    $errores = validar_usuario($email, $passwore);
+    $errores = validar_usuario_pass($email, $passwore);
 
     if (empty($errores)) {
         $usuario = login($email, $passwore);
 
         if ($usuario) {
+            session_start();
             $_SESSION['usuario_id']    = $usuario['id'];
             $_SESSION['usuario_email'] = $usuario['email'];
-            header('Location: ingreso.php');
-            exit;
+            header('Location:  pag/users.php');
         } else {
             $errores[] = "informacion incorrecta.";
         }
     }
+
 }
 ?>
 

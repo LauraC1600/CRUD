@@ -1,0 +1,25 @@
+<?php
+session_start();
+if (empty($_SESSION['usuario_id'])) {
+    header('Location: ../index.php');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcos</title>
+</head>
+
+<body>
+    <h1>listado de opciones</h1>
+    <a href="users.php">Usuarios</a>
+    <a href="">Barcos</a>
+    <a href="">Clientes</a>
+    <a href="">Salidas</a>
+</body>
+
+</html>
